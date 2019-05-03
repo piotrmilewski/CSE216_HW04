@@ -74,37 +74,33 @@ let polynomial lst =
     | h :: t -> polynomialHelp t (fun x -> fxn x + ((fst h) * int_of_float ( float_of_int x ** float_of_int (snd h))))
   in polynomialHelp lst (fun x -> 0);;
 
-(* get rid of later*)
-let square x = x*x;;
-let increment x = x+1;;
-let square_of_increment = composition square increment;;
+type bool_expr = 
+  | Lit of string
+  | Not of bool_expr
+  | And of bool_expr * bool_expr
+  | Or of bool_expr * bool_expr
 
-let f i = i * i;;
-let g i = 3 * i;;
+let rec truth_tableHelp a boolA b boolB expr = match expr with
+  | Lit l -> if l = a
+             then boolA
+             else boolB
+  | Not ex -> not(truth_tableHelp a boolA b boolB ex)
+  | And (ex1, ex2) -> truth_tableHelp a boolA b boolB ex1 && truth_tableHelp a boolA b boolB ex2
+  | Or (ex1, ex2) -> truth_tableHelp a boolA b boolB ex1 || truth_tableHelp a boolA b boolB ex2;;
 
-let shorter a1 a2 = if (String.length a1 < String.length a2)
-                    then a1
-                    else if (String.length a1 = String.length a2)
-                         then a1
-                         else a2;;
+let truth_table a b expr= 
+  [(true, true, truth_tableHelp a true b true expr);
+   (true, false, truth_tableHelp a true b false expr);
+   (false, true, truth_tableHelp a false b true expr);
+   (false, false, truth_tableHelp a false b false expr)];;
 
-pow 2 5;;
-pow 2 (-5);;
-float_pow 2.5 5;;
-float_pow 2.5 (-5);;
-reverse ["a"; "b"; "c"];;
-reverse [1; 2];;
-compress ["a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e"];;
-cluster ["a";"a";"a";"b";"c";"c";"a";"a"];;
-slice ["a";"b";"c";"d";"e";"f";"g";"h"] 2 6;;
-slice ["a";"b";"c";"d";"e";"f";"g";"h"] 3 2;;
-slice ["a";"b";"c";"d";"e";"f";"g";"h"] 3 20;;
-square_of_increment 4;;
-equiv_on f g [3];;
-equiv_on f g [1;2;3];;
-equiv_on f g [3;3;3];;
-pairwisefilter min [14; 11; 20; 25; 10; 11];;
-pairwisefilter min [14; 11; 20; 25; 10; 11; 9];;
-pairwisefilter shorter ["and"; "this"; "makes"; "shorter"; "strings"; "always"; "win"];;
-let f = polynomial [3, 3; -2, 1; 5, 0];;
-f 2;;
+type 'a binary_tree = 
+  | Empty
+  | Node of 'a * 'a binary_tree * 'a binary_tree;;
+
+let rec tree2str binTree = match binTree with
+  | Empty -> ""
+  | Node (r, Empty, Empty) -> string_of_int r
+  | Node (r, Empty, c2) -> (string_of_int r) ^ "(" ^ "," ^ (tree2str c2) ^ ")"
+  | Node (r, c1, Empty) -> (string_of_int r) ^ "(" ^ (tree2str c1) ^ "," ^ ")"
+  | Node (r, c1, c2) -> (string_of_int r) ^ "(" ^ (tree2str c1) ^ "," ^ (tree2str c2) ^ ")";; 
