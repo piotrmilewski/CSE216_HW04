@@ -61,17 +61,32 @@ let rec equiv_on f g lst = match lst with
               then equiv_on f g t
               else false;;
 
-(*let pairwisefilter fxn lst =
-  let pairwisefilterHelp fxn lst hold = match fxn with
+let pairwisefilter fxn lst =
+  let rec pairwisefilterHelp fxn lst hold = match lst with
     | [] -> reverse hold
-    | [*)
+    | [_] -> reverse ((List.hd lst) :: hold)
+    | h :: t -> pairwisefilterHelp fxn (List.tl t) ((fxn (List.hd t) h)::hold)
+  in pairwisefilterHelp fxn lst [];;
 
+let polynomial lst = 
+  let rec polynomialHelp lst fxn = match lst with
+    | [] -> fxn
+    | h :: t -> polynomialHelp t (fun x -> fxn x + ((fst h) * int_of_float ( float_of_int x ** float_of_int (snd h))))
+  in polynomialHelp lst (fun x -> 0);;
+
+(* get rid of later*)
 let square x = x*x;;
 let increment x = x+1;;
 let square_of_increment = composition square increment;;
 
 let f i = i * i;;
 let g i = 3 * i;;
+
+let shorter a1 a2 = if (String.length a1 < String.length a2)
+                    then a1
+                    else if (String.length a1 = String.length a2)
+                         then a1
+                         else a2;;
 
 pow 2 5;;
 pow 2 (-5);;
@@ -88,3 +103,8 @@ square_of_increment 4;;
 equiv_on f g [3];;
 equiv_on f g [1;2;3];;
 equiv_on f g [3;3;3];;
+pairwisefilter min [14; 11; 20; 25; 10; 11];;
+pairwisefilter min [14; 11; 20; 25; 10; 11; 9];;
+pairwisefilter shorter ["and"; "this"; "makes"; "shorter"; "strings"; "always"; "win"];;
+let f = polynomial [3, 3; -2, 1; 5, 0];;
+f 2;;
